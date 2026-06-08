@@ -1,19 +1,54 @@
+import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+// Import Layout dùng chung
+import TopBar from './components/TopBar';
+import Header from './components/Header';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+
+// Import Các Trang
+import Home from './pages/Home';
+import ProductDetail from './pages/shop/ProductDetail';
+import Login from './pages/auth/Login';
+import Register from './pages/auth/Register';
+import ForgotPassword from './pages/auth/ForgotPassword';
+import Cart from './pages/checkout/Cart';
+import Checkout from './pages/checkout/Checkout';
+import OrderSuccess from './pages/checkout/OrderSuccess';
+import ProductList from './pages/shop/ProductList';
+
 function App() {
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <div className="bg-white p-10 rounded-2xl shadow-2xl text-center">
-        <h1 className="text-4xl font-extrabold text-blue-600 mb-4">
-          Hobby Figure Shop
-        </h1>
-        <p className="text-gray-600 text-lg">
-          Chúc mừng! React và Tailwind CSS đã thông nòng.
-        </p>
-        <button className="mt-6 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
-          Bắt đầu mua sắm
-        </button>
+    <BrowserRouter>
+      <div className="min-h-screen bg-bg-main font-sans text-text-main flex flex-col">        
+        <TopBar />
+        <Header />
+        <Navbar />
+
+        <main className="flex-grow w-full">
+          <Routes>
+            {/* Nhóm Mua sắm công khai */}
+            <Route path="/" element={<Home />} />
+            <Route path="/product/:id" element={<ProductDetail />} />
+            <Route path="/collections/:category" element={<ProductList />} />    
+
+            {/* Nhóm Xác thực người dùng (Auth) */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+
+            {/* {Nhóm thanh toán} */}
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/order-success" element={<OrderSuccess />} />          </Routes>
+        </main>
+
+        <Footer />
+        
       </div>
-    </div>
-  )
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
