@@ -1,1 +1,20 @@
 @import "tailwindcss";
+
+@theme {
+  /* === 5 MÀU TỪ ẢNH CỦA BẠN (Hệ màu Chủ đạo) === */
+  --color-brand-dark: #25274D;     /* Xanh Navy đậm: Dùng cho Header, Footer, Chữ tiêu đề */
+  --color-brand-slate: #464866;    /* Xám xanh: Dùng cho viền, text phụ, icon không quan trọng */
+  --color-brand-gray: #AAABB8;     /* Xám nhạt: Dùng cho viền mờ, placeholder, thẻ disabled */
+  --color-brand-blue: #2E9CCA;     /* Xanh thiên thanh: Nút bấm phụ, Link, Icon tương tác */
+  --color-brand-teal: #29648A;     /* Xanh biển sâu: Dùng làm màu Hover cho nút brand-blue */
+
+  /* === MÀU NỀN CƠ BẢN === */
+  --color-bg-main: #F4F7F6;        /* Trắng xám nhạt: Làm nền toàn trang để đánh bật Card lên */
+  --color-bg-surface: #FFFFFF;     /* Trắng tinh: Nền của Card sản phẩm, Form đăng nhập */
+  --color-text-main: #111827;      /* Đen xám đậm: Màu chữ đọc nội dung chính */
+
+  /* === BỘ MÀU NHẤN ĐỂ WEB KHÔNG BỊ "PHẲNG" === */
+  --color-accent-red: #FF4757;     /* Đỏ San Hô: Độc quyền cho nút MUA NGAY, Giá Sale, lỗi */
+  --color-accent-green: #2ED573;   /* Xanh lục: Trạng thái "Còn hàng", "Đặt hàng thành công" */
+  --color-accent-yellow: #FFA502;  /* Vàng Cam: Đánh giá sao, nhãn HOT, cảnh báo */
+}
