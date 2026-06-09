@@ -1,14 +1,59 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, LogIn } from 'lucide-react';
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
+  
+  // Các state quản lý dữ liệu và trạng thái gọi API
+  const [usernameOrEmail, setUsernameOrEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const navigate = useNavigate();
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError('');
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:8080/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        // Gửi usernameOrEmail lên Backend
+        body: JSON.stringify({ usernameOrEmail, password }),
+      });
+
+      // Spring Boot trả về JSON nếu thành công, nhưng trả về Text thuần nếu lỗi
+      const textData = await response.text();
+      let data = {};
+      try { data = JSON.parse(textData); } catch (err) { data.message = textData; }
+
+      if (response.ok) {
+        // Lưu vé vào kho trình duyệt
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify({
+          fullName: data.fullName,
+          email: data.email,
+          role: data.role
+        }));
+        // Chuyển hướng về trang chủ
+        navigate('/'); 
+      } else {
+        setError(data.message || 'Lỗi đăng nhập!');
+      }
+    } catch (err) {
+      setError('Không thể kết nối đến trạm máy chủ!');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md bg-bg-surface border border-brand-gray p-8 rounded-sm shadow-xl relative overflow-hidden group">
-        {/* Đường kẻ trang trí HUD */}
         <div className="absolute top-0 left-0 w-1 h-12 bg-accent-red"></div>
         <div className="absolute top-0 left-0 w-12 h-1 bg-accent-red"></div>
 
@@ -19,7 +64,7 @@ const Login = () => {
           <p className="text-brand-slate text-sm mt-2">Nhập mã định danh để kết nối hệ thống</p>
         </div>
 
-        <form className="space-y-6">
+        <form onSubmit={handleLogin} className="space-y-6">
           {/* Email */}
           <div>
             <label className="block text-xs font-bold text-brand-slate uppercase mb-2 tracking-widest">Email / Pilot ID</label>
@@ -28,9 +73,12 @@ const Login = () => {
                 <Mail size={18} />
               </div>
               <input 
-                type="email" 
+                type="text"
+                value={usernameOrEmail}
+                onChange={(e) => setUsernameOrEmail(e.target.value)}
+                required
                 className="block w-full pl-10 pr-3 py-3 bg-white border border-brand-gray text-text-main text-sm focus:outline-none focus:border-accent-red focus:ring-1 focus:ring-accent-red transition-colors"
-                placeholder="pilot@c3gundam.com"
+                placeholder="Pilot ID hoặc Email"
               />
             </div>
           </div>
@@ -47,6 +95,9 @@ const Login = () => {
               </div>
               <input 
                 type={showPassword ? "text" : "password"} 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
                 className="block w-full pl-10 pr-10 py-3 bg-white border border-brand-gray text-text-main text-sm focus:outline-none focus:border-accent-red focus:ring-1 focus:ring-accent-red transition-colors"
                 placeholder="••••••••"
               />
@@ -60,13 +111,19 @@ const Login = () => {
             </div>
           </div>
 
+          {/* Vùng hiển thị lỗi */}
+          {error && <p className="text-accent-red text-sm font-bold text-center animate-pulse">{error}</p>}
+
           {/* Submit Button */}
-          <button className="w-full bg-accent-red hover:bg-[#d6002d] text-white font-black py-4 uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(255,71,87,0.3)]">
-            <LogIn size={20} /> Khởi động hệ thống
+          <button 
+            type="submit" 
+            disabled={isLoading}
+            className="w-full bg-accent-red hover:bg-[#d6002d] disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-black py-4 uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(255,71,87,0.3)]"
+          >
+            <LogIn size={20} /> {isLoading ? 'Đang kết nối...' : 'Khởi động hệ thống'}
           </button>
         </form>
 
-        {/* Hoặc đăng nhập bằng */}
         <div className="mt-8">
           <div className="relative mb-6">
             <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-brand-gray"></div></div>
