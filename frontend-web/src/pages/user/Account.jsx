@@ -3,31 +3,84 @@ import { useNavigate } from 'react-router-dom';
 import { User, Package, MapPin, Lock, LogOut, ShieldAlert } from 'lucide-react';
 
 const Account = () => {
-  // Trạng thái quản lý Tab đang được chọn (Mặc định là xem hồ sơ)
   const [activeTab, setActiveTab] = useState('profile');
   const [userData, setUserData] = useState(null);
   const navigate = useNavigate();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState({ fullName: '', phone: '' });
 
-  // Lấy thông tin User từ kho trình duyệt khi trang vừa load lên
+// Lấy thông tin User
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
     const token = localStorage.getItem('token');
     
-    // Nếu chưa đăng nhập (không có token) thì đuổi về trang Login
-    if (!token || !storedUser) {
+    if (!token) {
       navigate('/login');
-    } else {
-      setUserData(JSON.parse(storedUser));
+      return;
     }
+
+    const fetchUserProfile = async () => {
+      try {
+        const response = await fetch('http://localhost:8080/api/users/profile', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setUserData(data);
+          setEditForm({ fullName: data.fullName || '', phone: data.phone || '' });
+        } else {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          navigate('/login');
+        }
+      } catch (error) {
+        console.error("Lỗi kết nối trạm dữ liệu:", error);
+      }
+    };
+
+    fetchUserProfile();
   }, [navigate]);
 
   // Hàm xử lý Đăng xuất
   const handleLogout = () => {
-    // Xóa sạch vé thông hành và dữ liệu
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    // Đẩy về trang đăng nhập
     navigate('/login');
+  };
+
+  // Hàm cập nhật Profile
+  const handleUpdateProfile = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await fetch('http://localhost:8080/api/users/profile', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(editForm)
+      });
+
+      if (response.ok) {
+        setUserData({ ...userData, fullName: editForm.fullName, phone: editForm.phone });
+        const storedUser = JSON.parse(localStorage.getItem('user'));
+        storedUser.fullName = editForm.fullName;
+        localStorage.setItem('user', JSON.stringify(storedUser));
+        
+        setIsEditing(false);
+        alert("Cập nhật dữ liệu thành công!");
+        window.location.reload();
+      } else {
+        const errText = await response.text();
+        alert(errText);
+      }
+    } catch (error) {
+      console.error("Lỗi:", error);
+    }
   };
 
   // Danh sách các menu bên trái
@@ -104,28 +157,85 @@ const Account = () => {
             {/* Góc trang trí HUD */}
             <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-accent-red"></div>
 
-            {/* Render nội dung dựa trên State activeTab */}
             {activeTab === 'profile' && (
               <div className="animate-fadeIn">
-                <h3 className="text-xl font-black uppercase tracking-widest text-brand-dark mb-6 flex items-center gap-2">
-                  <User className="text-accent-red"/> Dữ liệu định danh
-                </h3>
-                {/* Tạm thời hiển thị dữ liệu từ LocalStorage, sau này sẽ cắm API vào đây */}
-                <div className="grid grid-cols-2 gap-6 text-sm">
-                  <div className="p-4 border border-brand-gray bg-gray-50">
-                    <p className="text-xs text-brand-slate font-bold uppercase mb-1">Họ và tên</p>
-                    <p className="font-bold text-text-main">{userData?.fullName}</p>
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-xl font-black uppercase tracking-widest text-brand-dark flex items-center gap-2">
+                    <User className="text-accent-red"/> Dữ liệu định danh Pilot
+                  </h3>
+                  
+                  {/* Nút bấm chuyển đổi Xem/Sửa */}
+                  {!isEditing ? (
+                    <button 
+                      onClick={() => setIsEditing(true)}
+                      className="text-xs bg-brand-dark text-white font-bold uppercase px-4 py-2 hover:bg-accent-red transition-colors"
+                    >
+                      Chỉnh sửa
+                    </button>
+                  ) : (
+                    <div className="flex gap-2">
+                      <button 
+                        onClick={() => setIsEditing(false)}
+                        className="text-xs bg-brand-gray text-white font-bold uppercase px-4 py-2 hover:bg-gray-500 transition-colors"
+                      >
+                        Hủy
+                      </button>
+                      <button 
+                        onClick={handleUpdateProfile}
+                        className="text-xs bg-accent-red text-white font-bold uppercase px-4 py-2 shadow-[0_0_10px_rgba(255,71,87,0.3)] hover:bg-[#d6002d] transition-colors"
+                      >
+                        Lưu thay đổi
+                      </button>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                  <div className="p-4 border border-brand-gray bg-gray-50 opacity-70">
+                    <p className="text-xs text-brand-slate font-bold uppercase mb-1">Mã định danh (Pilot ID)</p>
+                    <p className="font-bold text-text-main">{userData?.username || 'Chưa thiết lập'}</p>
+                    <p className="text-[10px] text-accent-red mt-1 italic">* Không thể thay đổi</p>
                   </div>
-                  <div className="p-4 border border-brand-gray bg-gray-50">
+
+                  <div className="p-4 border border-brand-gray bg-white">
+                    <p className="text-xs text-brand-slate font-bold uppercase mb-1">Họ và tên</p>
+                    {!isEditing ? (
+                      <p className="font-bold text-text-main">{userData?.fullName || 'Chưa cập nhật'}</p>
+                    ) : (
+                      <input 
+                        type="text" 
+                        value={editForm.fullName}
+                        onChange={(e) => setEditForm({...editForm, fullName: e.target.value})}
+                        className="w-full border-b border-brand-slate py-1 outline-none focus:border-accent-red text-text-main font-bold"
+                      />
+                    )}
+                  </div>
+
+                  <div className="p-4 border border-brand-gray bg-gray-50 opacity-70">
                     <p className="text-xs text-brand-slate font-bold uppercase mb-1">Email / Kênh liên lạc</p>
                     <p className="font-bold text-text-main">{userData?.email}</p>
+                    <p className="text-[10px] text-accent-red mt-1 italic">* Liên hệ chỉ huy để đổi Email</p>
                   </div>
-                  <div className="p-4 border border-brand-gray bg-gray-50">
-                    <p className="text-xs text-brand-slate font-bold uppercase mb-1">Quyền hạn</p>
-                    <p className="font-bold text-text-main uppercase">{userData?.role === 'customer' ? 'Pilot (Khách hàng)' : 'Commander (Admin)'}</p>
+
+                  <div className="p-4 border border-brand-gray bg-white">
+                    <p className="text-xs text-brand-slate font-bold uppercase mb-1">Số tần số (Số điện thoại)</p>
+                    {!isEditing ? (
+                      <p className="font-bold text-text-main">{userData?.phone || 'Chưa cập nhật'}</p>
+                    ) : (
+                      <input 
+                        type="tel" 
+                        value={editForm.phone}
+                        onChange={(e) => setEditForm({...editForm, phone: e.target.value})}
+                        className="w-full border-b border-brand-slate py-1 outline-none focus:border-accent-red text-text-main font-bold"
+                      />
+                    )}
                   </div>
-                  <div className="p-4 border border-brand-gray bg-gray-50 flex items-center justify-center">
-                     <button className="text-accent-red font-bold uppercase hover:underline">Chỉnh sửa thông tin</button>
+                  
+                  <div className="p-4 border border-brand-gray bg-gray-50 md:col-span-2">
+                    <p className="text-xs text-brand-slate font-bold uppercase mb-1">Quyền hạn hệ thống</p>
+                    <p className="font-bold text-accent-red uppercase text-sm">
+                      {userData?.role === 'customer' ? 'Hạm đội Pilot (Khách hàng)' : 'Commander (Ban chỉ huy)'}
+                    </p>
                   </div>
                 </div>
               </div>
