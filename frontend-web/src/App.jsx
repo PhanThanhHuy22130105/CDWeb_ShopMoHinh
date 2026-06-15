@@ -7,6 +7,9 @@ import Header from './components/Header';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 
+// Import "Chú bảo vệ"
+import PrivateRoute from './components/PrivateRoute';
+
 // Import Các Trang
 import Home from './pages/Home';
 import ProductDetail from './pages/shop/ProductDetail';
@@ -17,6 +20,7 @@ import Cart from './pages/checkout/Cart';
 import Checkout from './pages/checkout/Checkout';
 import OrderSuccess from './pages/checkout/OrderSuccess';
 import ProductList from './pages/shop/ProductList';
+import Account from './pages/user/Account';
 
 function App() {
   return (
@@ -28,7 +32,7 @@ function App() {
 
         <main className="flex-grow w-full">
           <Routes>
-            {/* Nhóm Mua sắm công khai */}
+            {/* Nhóm Mua sắm công khai (Ai cũng vào được) */}
             <Route path="/" element={<Home />} />
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/collections/:category" element={<ProductList />} />    
@@ -38,10 +42,22 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
 
-            {/* {Nhóm thanh toán} */}
+            {/* Nhóm Không gian cá nhân (BẮT BUỘC ĐĂNG NHẬP) */}
+            <Route 
+              path="/account" 
+              element={
+                <PrivateRoute>
+                  <Account />
+                </PrivateRoute>
+              } 
+            />
+
+            {/* Nhóm Thanh toán */}
             <Route path="/cart" element={<Cart />} />
+            {/* Gợi ý nhỏ: Sau này Checkout cũng nên bọc PrivateRoute nếu bạn bắt buộc khách phải đăng nhập mới được mua hàng */}
             <Route path="/checkout" element={<Checkout />} />
-            <Route path="/order-success" element={<OrderSuccess />} />          </Routes>
+            <Route path="/order-success" element={<OrderSuccess />} />          
+          </Routes>
         </main>
 
         <Footer />
