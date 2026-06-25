@@ -1,0 +1,11 @@
+# HƯỚNG DẪN: Copy file này thành application-local.properties rồi điền thông tin thật
+# cp application-local.properties.example application-local.properties
+
+# MySQL local
+spring.datasource.url=jdbc:mysql://localhost:3306/hobby_gundam_db?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Ho_Chi_Minh&allowPublicKeyRetrieval=true
+spring.datasource.username=root
+spring.datasource.password=
+
+# Mailtrap credentials - lấy tại: mailtrap.io -> Email Testing -> Inboxes -> SMTP Settings
+spring.mail.username=DIEN_USERNAME_MAILTRAP_VAO_DAY
+spring.mail.password=DIEN_PASSWORD_MAILTRAP_VAO_DAY
