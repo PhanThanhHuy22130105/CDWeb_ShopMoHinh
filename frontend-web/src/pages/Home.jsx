@@ -2,6 +2,8 @@ import React from 'react';
 import HeroSection from '../components/HeroSection';
 import ProductSection from '../components/ProductSection';
 import FlashSaleSection from '../components/FlashSaleSection';
+import TrendingSection from '../components/TrendingSection';
+import PromoBanners from '../components/PromoBanners';
 
 const Home = () => {
   // Data giả cho Hàng Mới Về
@@ -30,6 +32,16 @@ const Home = () => {
     { id: 24, name: "RG 041 1/144 Akatsuki Gundam", price: "1.600.000", oldPrice: "1.900.000", isNew: false, inStock: true },
   ];
 
+  // === DATA DÀNH CHO TRENDING SECTION ===
+  const gundamTags = ["GQuuuuuux", "Red Gundam", "HGGQ", "White Gundam", "Exia Gundam", "Aerial Gundam"];
+  
+  const gundamTabs = [
+    { id: 'hg', label: 'HG 1/144 High Grade' },
+    { id: 'rg', label: 'RG 1/144 Real Grade' },
+    { id: 'mg', label: 'MG 1/100 Master Grade' },
+    { id: 'pg', label: 'PG 1/60 Perfect Grade' },
+  ];
+
   return (
     <div className="w-full pb-12">
       <HeroSection />
@@ -45,12 +57,26 @@ const Home = () => {
         products={newArrivals} 
         viewAllLink="/hang-moi" 
       />
+
+      <PromoBanners /> 
+
       <ProductSection 
         titleWhite="SẢN PHẨM" 
         titleRed="BÁN CHẠY" 
         products={bestSellers} 
         viewAllLink="/ban-chay" 
       />
+
+      <TrendingSection 
+        titleBlack="Gundam Plastic Model"
+        titleRed="Bandai Nhật Bản"
+        subtitle="Nhiều tỉ lệ, đa dạng mẫu mã"
+        bannerImg="https://bizweb.dktcdn.net/100/382/833/themes/1088984/assets/image_tab1.jpg?1777947443506"
+        trendingTags={gundamTags}
+        tabCategories={gundamTabs}
+        products={saleProducts} 
+      />
+
       <ProductSection 
         titleWhite="SIÊU" 
         titleRed="KHUYẾN MÃI" 
