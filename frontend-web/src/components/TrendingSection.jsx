@@ -73,9 +73,10 @@ const TrendingSection = ({ titleBlack, titleRed, subtitle, bannerImg, trendingTa
             transition-colors"
           >
             <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 pb-4">
-              {/* Mẹo nhỏ: Mình nhân đôi mảng products lên để nó đủ dài sinh ra thanh cuộn cho bạn test */}
-              {products.concat(products).concat(products).slice(0, 12).map((product, index) => (
-                <ProductCard key={`${product.id}-${index}`} {...product} />
+              {products
+                .filter(product => product.category === activeTab)
+                .map((product) => (
+                  <ProductCard key={product.id} {...product} />
               ))}
             </div>
           </div>
