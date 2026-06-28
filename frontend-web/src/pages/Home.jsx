@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import HeroSection from '../components/HeroSection';
 import ProductSection from '../components/ProductSection';
 import FlashSaleSection from '../components/FlashSaleSection';
@@ -6,35 +6,34 @@ import TrendingSection from '../components/TrendingSection';
 import PromoBanners from '../components/PromoBanners';
 
 const Home = () => {
-  // Data giả cho Hàng Mới Về
-  const newArrivals = [
-    { id: 1, name: "Mô hình MG 1/100 RX-93 v Gundam", price: "1.650.000", oldPrice: "", isNew: true },
-    { id: 2, name: "Mô hình RG 1/144 MSN-04 Sazabi", price: "1.150.000", oldPrice: "", isNew: true },
-    { id: 3, name: "Mô hình HG 1/144 Gundam Aerial", price: "350.000", oldPrice: "", isNew: true },
-    { id: 4, name: "Pokemon Model Kit Quick!! 01", price: "180.000", oldPrice: "", isNew: true },
-  ];
+  // 1. Tạo các giỏ chứa dữ liệu thật (State)
+  const [saleProducts, setSaleProducts] = useState([]);
+  const [newArrivals, setNewArrivals] = useState([]);
+  const [allProducts, setAllProducts] = useState([]);
 
-  // Data giả cho Hàng Bán Chạy
-  const bestSellers = [
-    { id: 10, name: "Kìm Cắt Nhựa Mô Hình GodHand", price: "1.200.000", oldPrice: "", isNew: false },
-    { id: 11, name: "Bút Kẻ Lằn Chìm Gundam Marker", price: "60.000", oldPrice: "", isNew: false },
-    { id: 12, name: "Mô hình PG 1/60 Unleashed RX-78-2", price: "6.500.000", oldPrice: "", isNew: false },
-    { id: 13, name: "Action Base 1 Black (Đế trưng bày)", price: "140.000", oldPrice: "", isNew: false },
-  ];
+  // 2. Dùng useEffect để hút dữ liệu ngay khi vừa mở trang
+  useEffect(() => {
+    // Gọi API lấy Hàng Khuyến Mãi (Flash Sale)
+    fetch('http://localhost:8080/api/products/flash-sale')
+      .then(res => res.json())
+      .then(data => setSaleProducts(data))
+      .catch(err => console.error("Lỗi lấy hàng Flash Sale:", err));
 
+    // Gọi API lấy Hàng Mới Về
+    fetch('http://localhost:8080/api/products/new')
+      .then(res => res.json())
+      .then(data => setNewArrivals(data))
+      .catch(err => console.error("Lỗi lấy hàng Mới về:", err));
 
-  // Data giả cho Hàng Khuyến Mãi (Đã thêm đủ 5 sản phẩm để lấp đầy Flash Sale)
-  const saleProducts = [
-    { id: 20, name: "RE/100 1/100 Rebawoo [P-Bandai]", price: "2.100.000", oldPrice: "2.500.000", isNew: false, inStock: true },
-    { id: 21, name: "HGGQ 011 1/144 MS-06S Char's Zaku", price: "440.000", oldPrice: "550.000", isNew: false, inStock: true },
-    { id: 22, name: "HGGQ 004 1/144 GMS-a Red Gundam", price: "500.000", oldPrice: "650.000", isNew: false, inStock: true },
-    { id: 23, name: "HGCE 260 1/144 Z'Gok (Seed Ver)", price: "650.000", oldPrice: "800.000", isNew: true, inStock: true },
-    { id: 24, name: "RG 041 1/144 Akatsuki Gundam", price: "1.600.000", oldPrice: "1.900.000", isNew: false, inStock: true },
-  ];
+    // Gọi API lấy Tất cả sản phẩm (Cho cái bảng Trending)
+    fetch('http://localhost:8080/api/products')
+      .then(res => res.json())
+      .then(data => setAllProducts(data))
+      .catch(err => console.error("Lỗi lấy tất cả hàng:", err));
+  }, []); // [] đảm bảo chỉ hút 1 lần lúc mới tải trang
 
-  // === DATA DÀNH CHO TRENDING SECTION ===
+  // Data cố định cho các thẻ tìm kiếm
   const gundamTags = ["GQuuuuuux", "Red Gundam", "HGGQ", "White Gundam", "Exia Gundam", "Aerial Gundam"];
-  
   const gundamTabs = [
     { id: 'hg', label: 'HG 1/144 High Grade' },
     { id: 'rg', label: 'RG 1/144 Real Grade' },
@@ -45,44 +44,38 @@ const Home = () => {
   return (
     <div className="w-full pb-12">
       <HeroSection />
+      <PromoBanners />
       
-      <FlashSaleSection 
-        products={saleProducts} 
-        viewAllLink="/sale" 
-      />
+      {/* Đổ dữ liệu thật vào Flash Sale (Chỉ hiện nếu có hàng) */}
+      {saleProducts.length > 0 && (
+        <FlashSaleSection 
+          products={saleProducts} 
+          viewAllLink="/sale" 
+        />
+      )}
+      
+      {/* Đổ dữ liệu thật vào Trending */}
+      {allProducts.length > 0 && (
+        <TrendingSection 
+          titleBlack="Gundam Plastic Model"
+          titleRed="Bandai Nhật Bản"
+          subtitle="Nhiều tỉ lệ, đa dạng mẫu mã"
+          bannerImg="https://file.hstatic.net/200000287623/file/banner_coll_1.jpg" 
+          trendingTags={gundamTags}
+          tabCategories={gundamTabs}
+          products={allProducts} 
+        />
+      )}
 
-      <ProductSection 
-        titleWhite="HÀNG" 
-        titleRed="MỚI VỀ" 
-        products={newArrivals} 
-        viewAllLink="/hang-moi" 
-      />
-
-      <PromoBanners /> 
-
-      <ProductSection 
-        titleWhite="SẢN PHẨM" 
-        titleRed="BÁN CHẠY" 
-        products={bestSellers} 
-        viewAllLink="/ban-chay" 
-      />
-
-      <TrendingSection 
-        titleBlack="Gundam Plastic Model"
-        titleRed="Bandai Nhật Bản"
-        subtitle="Nhiều tỉ lệ, đa dạng mẫu mã"
-        bannerImg="https://bizweb.dktcdn.net/100/382/833/themes/1088984/assets/image_tab1.jpg?1777947443506"
-        trendingTags={gundamTags}
-        tabCategories={gundamTabs}
-        products={saleProducts} 
-      />
-
-      <ProductSection 
-        titleWhite="SIÊU" 
-        titleRed="KHUYẾN MÃI" 
-        products={saleProducts} 
-        viewAllLink="/sale" 
-      />
+      {/* Đổ dữ liệu thật vào Hàng Mới Về */}
+      {newArrivals.length > 0 && (
+        <ProductSection 
+          titleWhite="HÀNG" 
+          titleRed="MỚI VỀ" 
+          products={newArrivals} 
+          viewAllLink="/hang-moi" 
+        />
+      )}
     </div>
   );
 };
