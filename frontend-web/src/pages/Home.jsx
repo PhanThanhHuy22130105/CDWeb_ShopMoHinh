@@ -60,7 +60,7 @@ const Home = () => {
           titleBlack="Gundam Plastic Model"
           titleRed="Bandai Nhật Bản"
           subtitle="Nhiều tỉ lệ, đa dạng mẫu mã"
-          bannerImg="https://file.hstatic.net/200000287623/file/banner_coll_1.jpg" 
+          bannerImg="https://bizweb.dktcdn.net/100/382/833/themes/1088984/assets/image_tab1.jpg?1777947443506" 
           trendingTags={gundamTags}
           tabCategories={gundamTabs}
           products={allProducts} 

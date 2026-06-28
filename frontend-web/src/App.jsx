@@ -42,7 +42,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
 
-            {/* Nhóm Không gian cá nhân (BẮT BUỘC ĐĂNG NHẬP) */}
+            {/* Nhóm Không gian cá nhân */}
             <Route 
               path="/account" 
               element={
@@ -54,9 +54,14 @@ function App() {
 
             {/* Nhóm Thanh toán */}
             <Route path="/cart" element={<Cart />} />
-            {/* Gợi ý nhỏ: Sau này Checkout cũng nên bọc PrivateRoute nếu bạn bắt buộc khách phải đăng nhập mới được mua hàng */}
             <Route path="/checkout" element={<Checkout />} />
-            <Route path="/order-success" element={<OrderSuccess />} />          
+            <Route path="/order-success" element={<OrderSuccess />} />   
+
+            {/* Nhóm sản phẩm  */}
+            <Route path="/category/:category" element={<ProductList />} />
+            <Route path="/collections/:category" element={<ProductList />} />
+            <Route path="/sale" element={<ProductList />} />
+            <Route path="/hang-moi" element={<ProductList />} />
           </Routes>
         </main>
 

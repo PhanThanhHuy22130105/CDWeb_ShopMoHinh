@@ -1,5 +1,6 @@
 package com.hobby.backend_api.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,6 +37,7 @@ public class Product {
     private String category;
 
     // Đánh dấu sản phẩm mới về
+    @JsonProperty("isNew")
     @Column(name = "is_new")
     private boolean isNew = false;
 
@@ -44,6 +46,7 @@ public class Product {
     private boolean inStock = true;
 
     // Đánh dấu có nằm trong đợt Flash Sale không
+    @JsonProperty("isFlashSale")
     @Column(name = "is_flash_sale")
     private boolean isFlashSale = false;
 }
